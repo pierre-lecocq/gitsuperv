@@ -1,7 +1,7 @@
 PROGNAME=gitsuperv
 CC=gcc
 
-$(PROGNAME):
+$(PROGNAME): src/*.c
 	     $(CC) src/*.c -o $(PROGNAME) -lgit2
 
 clean:
