@@ -8,3 +8,4 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <git2.h>
