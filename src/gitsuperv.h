@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/types.h>
+#include <dirent.h>
 #include <git2.h>
 
 /*
@@ -35,19 +37,20 @@ typedef struct options {
     int                 verbosity;
     char                *repo_basedir;
     git_status_options  status_opts;
-} struct_options;
+} st_options;
 
 /*
  * Synopsis
  */
 
-void check_repository_status(char *repo_path);
+char **get_repositories_paths();
+int check_repository_status(char *repo_path);
+void dump_current_status(char *path, git_status_list *status);
 void get_last_error(int error_code);
-void print_message(char *str, int message_type);
 
 
 /*
  * Globals
  */
 
-static struct options opts;
+static st_options opts;
