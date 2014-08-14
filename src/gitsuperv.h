@@ -15,29 +15,31 @@
 #include <string.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <ctype.h>
 #include <git2.h>
 
 /*
  * Defines
  */
-
-#define MESSAGE_NOTICE 1
-#define MESSAGE_WARNING 2
-#define MESSAGE_ERROR 3
-
-#define VERBOSITY_NULL 0
-#define VERBOSITY_MIN 1
-#define VERBOSITY_MAX 2
+#define MAXBUF 1024
 
 /*
  * Types
  */
 
-typedef struct options {
-    int                 verbosity;
-    char                *repo_basedir;
+typedef struct config {
+    char                *basedir;
     git_status_options  status_opts;
-} st_options;
+} st_config;
+
+typedef struct result {
+    char                *path;
+    int                 total;
+    int                 modified;
+    int                 created;
+    int                 deleted;
+    int                 untracked;
+} st_result;
 
 /*
  * Synopsis
@@ -45,12 +47,12 @@ typedef struct options {
 
 char **get_repositories_paths();
 int check_repository_status(char *repo_path);
-void dump_current_status(char *path, git_status_list *status);
+st_result get_current_status(char *path, git_status_list *status);
 void get_last_error(int error_code);
-
+void load_config_from_file(char *config_file_path);
 
 /*
  * Globals
  */
 
-static st_options opts;
+static st_config config;

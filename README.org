@@ -1,0 +1,29 @@
+* Gitsuperv
+
+** Install
+
+*** Download the sources
+
+#+begin_src sh
+git clone https://github.com/pierre-lecocq/gitsuperv
+#+end_src
+
+*** Compile
+
+#+begin_src sh
+cd gitsuperv && make
+#+end_src
+
+
+*** Install libgit2 (mandatory)
+
+If an error occurs on compilation because of /libgit2/, simply install it on your system.
+
+#+begin_src sh
+git clone https://github.com/libgit2/libgit2
+cd libgit2 && mkdir build && cd build
+cmake .. && sudo cmake --build . --target install && cd ../..
+rm -rf libgit2
+#+end_src
+
+And then try to compile again /gitsuperv/

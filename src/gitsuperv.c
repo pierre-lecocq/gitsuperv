@@ -12,21 +12,24 @@
  */
 char **get_repositories_paths()
 {
-    char **paths;
+    int len;
+    int count;
     DIR *dirp;
-    int count = 0;
+    char *path;
+    char **paths;
     struct dirent *file;
 
     /* Open */
-    if ((dirp = opendir(opts.repo_basedir)) == NULL) {
-        perror ("Couldn't open the directory");
+    if ((dirp = opendir(config.basedir)) == NULL) {
+        printf("Can not open directory %s\n", config.basedir);
+        exit(1);
     }
 
     /* Count */
+    count = 0;
     while ((file = readdir(dirp))) {
-        if (strstr(file->d_name, ".") != NULL || file->d_type != DT_DIR)
-            continue;
-        count++;
+        if (file->d_name != "." && file->d_name != ".." && file->d_type == DT_DIR)
+            count++;
     }
 
     /* Reset */
@@ -36,13 +39,13 @@ char **get_repositories_paths()
 
     /* Fill */
     while ((file = readdir(dirp))) {
-        if (strstr(file->d_name, ".") != NULL || file->d_type != DT_DIR)
+        if (file->d_name == "." || file->d_name == ".." || file->d_type != DT_DIR)
             continue;
 
-        int len = strlen(opts.repo_basedir) + 1 + strlen(file->d_name) + 1;
-        char *path = (char *) malloc(len * sizeof(char));
+        len = strlen(config.basedir) + 1 + strlen(file->d_name) + 1;
+        path = (char *) malloc(len * sizeof(char));
 
-        sprintf(path, "%s/%s", opts.repo_basedir, file->d_name);
+        sprintf(path, "%s/%s", config.basedir, file->d_name);
         paths[count] = path;
         count++;
     }
@@ -61,6 +64,7 @@ int check_repository_status(char *repo_path)
     int error_code = 0;
     git_repository *repo = NULL;
     git_status_list *status;
+    st_result result;
 
     /* Open repository */
     error_code = git_repository_open(&repo, repo_path);
@@ -68,12 +72,15 @@ int check_repository_status(char *repo_path)
         return(1);
 
     /* Check status */
-    error_code = git_status_list_new(&status, repo, &opts.status_opts);
+    error_code = git_status_list_new(&status, repo, &config.status_opts);
     if (error_code < 0)
         get_last_error(error_code);
 
-    /* Dump */
-    dump_current_status(repo_path, status);
+    /* Get result */
+    result = get_current_status(repo_path, status);
+
+    /* Dump result */
+    printf("%-50s %d files - c:%d m:%d d:%d u:%d\n", result.path, result.total, result.created, result.modified, result.deleted, result.untracked);
 
     /* Free */
     git_status_list_free(status);
@@ -83,23 +90,59 @@ int check_repository_status(char *repo_path)
 }
 
 /*
- * Dump current status
+ * Get current status
  */
-void dump_current_status(char *path, git_status_list *status)
+st_result get_current_status(char *path, git_status_list *status)
 {
-    size_t nb_entries = git_status_list_entrycount(status);
+    int x;
+    size_t nb_entries;
+    const git_status_entry *se;
+    st_result result;
 
-    if (nb_entries  > 0) {
-        printf("[%s] %zu files to commit\n", path, nb_entries);
-        /* int x; */
-        /* const git_status_entry *se; */
-        /* for (x = 0; x < nb_entries; x++) { */
-        /*     se = git_status_byindex(status, x); */
-        /*     if (se->status == GIT_STATUS_CURRENT) { */
-        /*         continue; */
-        /*     } */
-        /* } */
+    nb_entries = git_status_list_entrycount(status);
+
+    result.path = (char *)malloc((strlen(path) + 1) * sizeof(char *));
+    strcpy(result.path, path);
+    result.total = nb_entries;
+    result.modified = 0;
+    result.created = 0;
+    result.deleted = 0;
+    result.untracked = 0;
+
+    for (x = 0; x < nb_entries; x++) {
+        se = git_status_byindex(status, x);
+        if (se->status == GIT_STATUS_CURRENT) {
+            continue;
+        }
+
+        if (se->status & GIT_STATUS_WT_NEW) {
+            result.untracked++;
+        }
+
+        if (se->status & GIT_STATUS_INDEX_NEW) {
+            result.created++;
+        }
+
+        if (
+            se->status & GIT_STATUS_INDEX_MODIFIED
+            || se->status & GIT_STATUS_INDEX_RENAMED
+            || se->status & GIT_STATUS_INDEX_TYPECHANGE
+            || se->status & GIT_STATUS_WT_MODIFIED
+            || se->status & GIT_STATUS_WT_RENAMED
+            || se->status & GIT_STATUS_WT_TYPECHANGE
+        ) {
+            result.modified++;
+        }
+
+        if (
+            se->status & GIT_STATUS_INDEX_DELETED
+            || se->status & GIT_STATUS_WT_DELETED
+        ) {
+            result.deleted++;
+        }
     }
+
+    return(result);
 }
 
 /*
@@ -114,22 +157,76 @@ void get_last_error(int error_code)
     exit(error_code);
 }
 
+
+
+void chomp(const char *s)
+{
+    char *p;
+
+    while (NULL != s && NULL != (p = strrchr(s, '\n'))){
+        *p = '\0';
+    }
+}
+
+/*
+ * Get config
+ */
+void load_config_from_file(char *config_file_path)
+{
+    FILE *fd;
+    int i = 0;
+    char line[MAXBUF];
+    char *key;
+    char *value;
+
+    config.status_opts.version = 1;
+    config.status_opts.show = GIT_STATUS_SHOW_INDEX_AND_WORKDIR;
+    config.status_opts.flags = GIT_STATUS_OPT_INCLUDE_UNTRACKED |
+        GIT_STATUS_OPT_RENAMES_HEAD_TO_INDEX |
+        GIT_STATUS_OPT_SORT_CASE_SENSITIVELY;
+
+    /* Open file */
+    fd = fopen(config_file_path, "r");
+    if (fd == NULL) {
+        printf("Can not load config file\n");
+        exit(1);
+    }
+
+    /* Read lines */
+    while (fgets(line, sizeof(line), fd) != NULL) {
+        key = strtok(line, "=");
+        value = strtok(NULL, "=");
+        chomp(value);
+
+        if (strcmp(key, "basedir") == 0) {
+            config.basedir = (char *)malloc((strlen(value)+1) * sizeof(char));
+            strcpy(config.basedir, value);
+        }
+    }
+
+    /* Close */
+    fclose(fd);
+}
+
 /*
  * Main
  */
 int main(int ac, char **av)
 {
-    opts.verbosity = 1;
-    opts.repo_basedir = "/Users/pierre/work";
+    int x;
+    char **paths;
+    char *config_file_path;
 
-    opts.status_opts.show = GIT_STATUS_SHOW_INDEX_AND_WORKDIR;
-    opts.status_opts.version = 1;
-    opts.status_opts.flags = GIT_STATUS_OPT_INCLUDE_UNTRACKED |
-        GIT_STATUS_OPT_RENAMES_HEAD_TO_INDEX |
-        GIT_STATUS_OPT_SORT_CASE_SENSITIVELY;
+    /* Get config */
+    config_file_path = (char *)malloc((strlen(getenv("HOME")) + 12) * sizeof(char));
+    sprintf(config_file_path, "%s/%s", getenv("HOME"), ".gitsuperv");
+    load_config_from_file(config_file_path);
 
-    char **paths = get_repositories_paths();
-    for (int x = 0; x < sizeof(paths); x++) {
+    /* Get paths */
+    paths = get_repositories_paths();
+
+    /* Get statuses */
+    for (x = 0; (x < sizeof(paths) && paths[x]); x++) {
         check_repository_status(paths[x]);
     }
 
