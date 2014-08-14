@@ -57,7 +57,7 @@ char **get_repositories_paths()
 }
 
 /*
- * Check a single repository status accordin to its path
+ * Check a single repository status according to its path
  */
 int check_repository_status(char *repo_path)
 {
@@ -157,8 +157,9 @@ void get_last_error(int error_code)
     exit(error_code);
 }
 
-
-
+/*
+ * Chomp a string
+ */
 void chomp(const char *s)
 {
     char *p;
