@@ -15,7 +15,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <dirent.h>
-#include <ctype.h>
 #include <git2.h>
 
 /*
