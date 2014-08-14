@@ -28,7 +28,6 @@ char **get_repositories_paths()
     /* Count */
     count = 0;
     while ((file = readdir(dirp))) {
-        // f
         if (strcmp(file->d_name, ".") != 0 && strcmp(file->d_name, "..") != 0 && file->d_type == DT_DIR)
             count++;
     }
@@ -40,7 +39,6 @@ char **get_repositories_paths()
 
     /* Fill */
     while ((file = readdir(dirp))) {
-        // t
         if (strcmp(file->d_name, ".") == 0 || strcmp(file->d_name, "..") == 0 || file->d_type != DT_DIR)
             continue;
 
@@ -76,7 +74,7 @@ int check_repository_status(char *repo_path)
     /* Check status */
     error_code = git_status_list_new(&status, repo, &config.status_opts);
     if (error_code < 0)
-        get_last_error(error_code);
+        get_last_git_error(error_code);
 
     /* Get result */
     result = get_current_status(repo_path, status);
@@ -150,7 +148,7 @@ st_result get_current_status(char *path, git_status_list *status)
 /*
  * Get last error according to a returning value
  */
-void get_last_error(int error_code)
+void get_last_git_error(int error_code)
 {
     const git_error *e = giterr_last();
 

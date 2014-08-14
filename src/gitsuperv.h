@@ -48,7 +48,7 @@ typedef struct result {
 char **get_repositories_paths();
 int check_repository_status(char *repo_path);
 st_result get_current_status(char *path, git_status_list *status);
-void get_last_error(int error_code);
+void get_last_git_error(int error_code);
 void load_config_from_file(char *config_file_path);
 
 /*
