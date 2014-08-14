@@ -2,10 +2,10 @@ PROGNAME=gitsuperv
 MANPAGE=$(PROGNAME).1.gz
 
 $(PROGNAME): src/*.c
-	     gcc src/*.c -o $(PROGNAME) -lgit2
+	     gcc -Wall -fstack-protector -O2 src/*.c -o $(PROGNAME) -lgit2
 
-$(MANPAGE): $(PROGNAME).1
-	gzip -9 -n -c $(PROGNAME).1 > $(MANPAGE)
+man:
+	gzip -9 -n -c doc/$(PROGNAME).1 > $(MANPAGE)
 
 install: $(PROGNAME) $(MANPAGE)
 	install -D $(PROGNAME) /usr/bin/$(PROGNAME)
@@ -20,3 +20,7 @@ uninstall:
 clean:
 	rm -f $(PROGNAME)
 	rm -f $(MANPAGE)
+
+all: $(PROGNAME) man
+
+re: clean all

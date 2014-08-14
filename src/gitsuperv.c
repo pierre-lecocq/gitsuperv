@@ -28,7 +28,8 @@ char **get_repositories_paths()
     /* Count */
     count = 0;
     while ((file = readdir(dirp))) {
-        if (file->d_name != "." && file->d_name != ".." && file->d_type == DT_DIR)
+        // f
+        if (strcmp(file->d_name, ".") != 0 && strcmp(file->d_name, "..") != 0 && file->d_type == DT_DIR)
             count++;
     }
 
@@ -39,7 +40,8 @@ char **get_repositories_paths()
 
     /* Fill */
     while ((file = readdir(dirp))) {
-        if (file->d_name == "." || file->d_name == ".." || file->d_type != DT_DIR)
+        // t
+        if (strcmp(file->d_name, ".") == 0 || strcmp(file->d_name, "..") == 0 || file->d_type != DT_DIR)
             continue;
 
         len = strlen(config.basedir) + 1 + strlen(file->d_name) + 1;
@@ -175,7 +177,6 @@ void chomp(const char *s)
 void load_config_from_file(char *config_file_path)
 {
     FILE *fd;
-    int i = 0;
     char line[MAXBUF];
     char *key;
     char *value;
