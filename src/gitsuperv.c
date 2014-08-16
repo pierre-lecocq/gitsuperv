@@ -80,13 +80,45 @@ int check_repository_status(char *repo_path)
     result = get_current_status(repo_path, status);
 
     /* Dump result */
-    printf("%-50s %d files - c:%d m:%d d:%d u:%d\n", result.path, result.total, result.created, result.modified, result.deleted, result.untracked);
+    dump_current_status(result);
 
     /* Free */
     git_status_list_free(status);
     git_repository_free(repo);
 
     return(0);
+}
+
+/*
+ * Dump current status
+ */
+void dump_current_status(st_result result)
+{
+    char *fmt;
+
+    if (use_colors == 1) {
+        fmt = "%-50s %d files - "
+            COLOR_CREATED
+            " +%d "
+            COLOR_MODIFIED
+            " ~%d "
+            COLOR_DELETED
+            " -%d "
+            COLOR_UNTRACKED
+            " ?%d\n"
+            COLOR_RESET;
+    } else {
+        fmt = "%-50s %d files - +%d ~%d -%d ?%d\n";
+    }
+
+    printf(fmt,
+           result.path,
+           result.total,
+           result.created,
+           result.modified,
+           result.deleted,
+           result.untracked
+    );
 }
 
 /*
@@ -115,10 +147,6 @@ st_result get_current_status(char *path, git_status_list *status)
             continue;
         }
 
-        if (se->status & GIT_STATUS_WT_NEW) {
-            result.untracked++;
-        }
-
         if (se->status & GIT_STATUS_INDEX_NEW) {
             result.created++;
         }
@@ -139,6 +167,10 @@ st_result get_current_status(char *path, git_status_list *status)
             || se->status & GIT_STATUS_WT_DELETED
         ) {
             result.deleted++;
+        }
+
+        if (se->status & GIT_STATUS_WT_NEW) {
+            result.untracked++;
         }
     }
 
@@ -216,6 +248,8 @@ int main(int ac, char **av)
     int x;
     char **paths;
     char *config_file_path;
+
+    use_colors = isatty(fileno(stdout));
 
     /* Get config */
     config_file_path = (char *)malloc((strlen(getenv("HOME")) + 12) * sizeof(char));

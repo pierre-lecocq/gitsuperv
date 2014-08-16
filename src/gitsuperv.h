@@ -22,6 +22,12 @@
  */
 #define MAXBUF 1024
 
+#define COLOR_UNTRACKED         "\x1b[31m"
+#define COLOR_CREATED           "\x1b[32m"
+#define COLOR_MODIFIED          "\x1b[33m"
+#define COLOR_DELETED           "\x1b[35m"
+#define COLOR_RESET             "\x1b[0m"
+
 /*
  * Types
  */
@@ -46,6 +52,7 @@ typedef struct result {
 
 char **get_repositories_paths();
 int check_repository_status(char *repo_path);
+void dump_current_status(st_result result);
 st_result get_current_status(char *path, git_status_list *status);
 void get_last_git_error(int error_code);
 void load_config_from_file(char *config_file_path);
@@ -55,3 +62,4 @@ void load_config_from_file(char *config_file_path);
  */
 
 static st_config config;
+static int use_colors;
