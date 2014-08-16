@@ -9,7 +9,7 @@ man:
 
 install: $(PROGNAME) $(MANPAGE)
 	install -D $(PROGNAME) /usr/bin/$(PROGNAME)
-	install -D -m 644 $(MANPAGE) /sur/share/man/man1/$(MANPAGE)
+	install -D -m 644 $(MANPAGE) /usr/share/man/man1/$(MANPAGE)
 
 uninstall:
 	rm -f /usr/bin/$(PROGNAME)

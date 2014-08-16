@@ -80,7 +80,7 @@ int check_repository_status(char *repo_path)
     result = get_current_status(repo_path, status);
 
     /* Dump result */
-    dump_current_status(result);
+    print_current_status(result);
 
     /* Free */
     git_status_list_free(status);
@@ -92,12 +92,13 @@ int check_repository_status(char *repo_path)
 /*
  * Dump current status
  */
-void dump_current_status(st_result result)
+void print_current_status(st_result result)
 {
     char *fmt;
+    char *sign;
 
     if (use_colors == 1) {
-        fmt = "%-50s %d files - "
+        fmt = "%s%-25s %d files:"
             COLOR_CREATED
             " +%d "
             COLOR_MODIFIED
@@ -108,11 +109,18 @@ void dump_current_status(st_result result)
             " ?%d\n"
             COLOR_RESET;
     } else {
-        fmt = "%-50s %d files - +%d ~%d -%d ?%d\n";
+        fmt = "%s%-25s %d files: +%d ~%d -%d ?%d\n";
+    }
+
+    if (result.total > 0) {
+        sign = " * ";
+    } else {
+        sign = "   ";
     }
 
     printf(fmt,
-           result.path,
+           sign,
+           result.name,
            result.total,
            result.created,
            result.modified,
@@ -133,14 +141,22 @@ st_result get_current_status(char *path, git_status_list *status)
 
     nb_entries = git_status_list_entrycount(status);
 
+    /* Path */
     result.path = (char *)malloc((strlen(path) + 1) * sizeof(char *));
     strcpy(result.path, path);
+
+    /* Name */
+    // +1 for moving pointer to the second index and remove the slash
+    result.name = strrchr(path, '/') + 1;
+
+    /* Init files counters */
     result.total = nb_entries;
     result.modified = 0;
     result.created = 0;
     result.deleted = 0;
     result.untracked = 0;
 
+    /* Count files */
     for (x = 0; x < nb_entries; x++) {
         se = git_status_byindex(status, x);
         if (se->status == GIT_STATUS_CURRENT) {
