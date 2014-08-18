@@ -16,7 +16,7 @@ git clone https://github.com/pierre-lecocq/gitsuperv
 *** Compile
 
 #+begin_src sh
-cd gitsuperv && make all && sudo make install
+cd gitsuperv && make && sudo make install
 #+end_src
 
 *** Install libgit2 (mandatory)
