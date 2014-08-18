@@ -7,6 +7,9 @@ $(PROGNAME): src/*.c
 man:
 	gzip -9 -n -c doc/$(PROGNAME).1 > $(MANPAGE)
 
+manhtml:
+	cat doc/$(PROGNAME).1 | groff -mandoc -Thtml > $(PROGNAME).1.html
+
 install: $(PROGNAME) $(MANPAGE)
 	install -D $(PROGNAME) /usr/bin/$(PROGNAME)
 	install -D -m 644 $(MANPAGE) /usr/share/man/man1/$(MANPAGE)
@@ -20,7 +23,8 @@ uninstall:
 clean:
 	rm -f $(PROGNAME)
 	rm -f $(MANPAGE)
+	rm -f $(PROGNAME).1.html
 
-all: $(PROGNAME) man
+all: $(PROGNAME) man manhtml
 
 re: clean all
