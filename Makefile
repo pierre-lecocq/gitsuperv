@@ -1,29 +1,31 @@
 PROGNAME=gitsuperv
-MANPAGE=$(PROGNAME).1.gz
+MANPAGE=$(PROGNAME).1
+MANPAGE_GZ=$(MANPAGE).gz
+MANPAGE_HTML=$(MANPAGE).html
 
 $(PROGNAME): src/*.c
 	     gcc -Wall -fstack-protector -O2 src/*.c -o $(PROGNAME) -lgit2
 
 man:
-	gzip -9 -n -c doc/$(PROGNAME).1 > $(MANPAGE)
+	gzip -9 -n -c doc/$(MANPAGE) > $(MANPAGE_GZ)
 
 manhtml:
-	cat doc/$(PROGNAME).1 | groff -mandoc -Thtml > $(PROGNAME).1.html
+	cat doc/$(MANPAGE) | groff -mandoc -Thtml > $(MANPAGE_HTML)
 
-install: $(PROGNAME) $(MANPAGE)
+install: $(PROGNAME) $(MANPAGE_GZ)
 	install -D $(PROGNAME) /usr/bin/$(PROGNAME)
-	install -D -m 644 $(MANPAGE) /usr/share/man/man1/$(MANPAGE)
+	install -D -m 644 $(MANPAGE_GZ) /usr/share/man/man1/$(MANPAGE_GZ)
 
 uninstall:
 	rm -f /usr/bin/$(PROGNAME)
-	rm -f /usr/share/man/man1/$(MANPAGE)
+	rm -f /usr/share/man/man1/$(MANPAGE_GZ)
 
 .PHONY: clean install uninstall
 
 clean:
 	rm -f $(PROGNAME)
-	rm -f $(MANPAGE)
-	rm -f $(PROGNAME).1.html
+	rm -f $(MANPAGE_GZ)
+	rm -f $(MANPAGE_HTML)
 
 all: $(PROGNAME) man manhtml
 
