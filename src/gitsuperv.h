@@ -1,6 +1,6 @@
 /*
  * File: gitsuperv.h
- * Time-stamp: <>
+ * Time-stamp: <2014-08-18 23:58:54 pierre>
  * Copyright (C) 2014 Pierre Lecocq
  * Description: Git supervisor include file
  */
@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <getopt.h>
 #include <string.h>
 #include <sys/types.h>
 #include <dirent.h>
@@ -34,6 +35,7 @@
 
 typedef struct config {
     char                *basedir;
+    int                 use_colors;
     git_status_options  status_opts;
 } st_config;
 
@@ -52,7 +54,6 @@ typedef struct result {
  */
 
 static st_config config;
-static int use_colors;
 
 /*
  * Synopsis
@@ -65,3 +66,4 @@ st_result get_current_status(char *path, git_status_list *status);
 void get_last_git_error(int error_code);
 void chomp(const char *s);
 void load_config_from_file(char *config_file_path);
+void usage(int exit_code);

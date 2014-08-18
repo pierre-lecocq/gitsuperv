@@ -1,6 +1,6 @@
 /*
  * File: gitsuperv.c
- * Time-stamp: <>
+ * Time-stamp: <2014-08-19 00:00:13 pierre>
  * Copyright (C) 2014 Pierre Lecocq
  * Description: Git supervisor
  */
@@ -97,7 +97,7 @@ void print_current_status(st_result result)
     char *fmt;
     char *sign;
 
-    if (use_colors == 1) {
+    if (config.use_colors == 1) {
         fmt = "%s%-25s %d files:"
             COLOR_CREATED
             " +%d "
@@ -235,42 +235,76 @@ void load_config_from_file(char *config_file_path)
 
     /* Open file */
     fd = fopen(config_file_path, "r");
-    if (fd == NULL) {
-        printf("Can not load config file\n");
-        exit(1);
-    }
+    if (fd != NULL) {
+        /* Read lines */
+        while (fgets(line, sizeof(line), fd) != NULL) {
+            key = strtok(line, "=");
+            value = strtok(NULL, "=");
+            chomp(value);
 
-    /* Read lines */
-    while (fgets(line, sizeof(line), fd) != NULL) {
-        key = strtok(line, "=");
-        value = strtok(NULL, "=");
-        chomp(value);
-
-        if (strcmp(key, "basedir") == 0) {
-            config.basedir = (char *)malloc((strlen(value)+1) * sizeof(char));
-            strcpy(config.basedir, value);
+            if (strcmp(key, "basedir") == 0) {
+                config.basedir = (char *)malloc((strlen(value)+1) * sizeof(char));
+                strcpy(config.basedir, value);
+            }
         }
-    }
 
-    /* Close */
-    fclose(fd);
+        /* Close */
+        fclose(fd);
+    }
+}
+
+/*
+ * Print usage and exit if needed
+ */
+void usage(int exit_code)
+{
+    printf("\ngitsuperv - Watch your git repositories status\n\n");
+    printf("\t-b, --basedir=BASEDIR\n");
+    printf("\n");
+
+    if (exit_code > 0) {
+        exit(exit_code);
+    }
 }
 
 /*
  * Main
  */
-int main(int ac, char **av)
+int main(int argc, char **argv)
 {
     int x;
     char **paths;
     char *config_file_path;
+    struct option longopts[] = {
+        {"basedir", optional_argument, NULL, 'b'},
+        {0, 0, 0, 0}
+    };
 
-    use_colors = isatty(fileno(stdout));
+    config.use_colors = isatty(fileno(stdout));
 
-    /* Get config */
+    /* Get options from file */
     config_file_path = (char *)malloc((strlen(getenv("HOME")) + 12) * sizeof(char));
     sprintf(config_file_path, "%s/%s", getenv("HOME"), ".gitsuperv");
     load_config_from_file(config_file_path);
+
+    /* Get options */
+    if (argc > 1) {
+        while ((x = getopt_long(argc, argv, "b:", longopts, NULL)) != -1) {
+            switch (x) {
+            case 'b':
+                config.basedir = optarg;
+                break;
+
+            default:
+                usage(1);
+            }
+        }
+    }
+
+    /* Check options */
+    if (config.basedir == NULL) {
+        usage(1);
+    }
 
     /* Get paths */
     paths = get_repositories_paths();

@@ -34,17 +34,24 @@ And then try to compile again /gitsuperv/
 
 ** Run
 
-*** Setup config file
+*** Launch the binary
+
+Simply run this command:
+
+#+begin_src sh
+gitsuperv -b /path/your/work/directory
+#+end_src
+
+*** Setup config file (optional)
 
 Create a =~/.gitsuperv= file and add an absolute path of the folder that host your repositories (without a trailing slash)
 
 #+begin_src sh
-basedir=/home/pierre/work
+basedir=/path/your/work/directory
 #+end_src
 
-*** Launch the binary
-
-Simply run this command:
+This will allow you to permanently set the /basedir/ (-b) option.
+Now, just run
 
 #+begin_src sh
 gitsuperv
@@ -61,7 +68,7 @@ Legend:
 - /-n/ is the number of deleted files
 - /?n/ is the number of untracked files
 
+
 ** Todolist
 
-- Allow command line options
 - Improve output

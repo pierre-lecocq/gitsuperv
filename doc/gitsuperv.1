@@ -3,15 +3,30 @@
 .SH NAME
 \fBgitsuperv\fP \- Watch your git repositories status
 
+
+.SH SYNOPSIS
+
+\fBgitsuperv\fP [\fB-b\fP=basedir]
+
 .SH DESCRIPTION
 \fBgitsuperv\fP reports the status of your git repositories
 from your work base directory
 
-An option can be used to specify the base directory. This option
-is configurable via a config file.
+.SH OPTIONS
+.TP
+.BR \-b ", " \-\-basedir =\fIBASEDIR
+The base directory where the software will be rooted
+
+.SH FILES
+\fI~/.gitsuperv\fP is the main config files with on of the following options:
+.TP
+basedir=/path/your/work/directory
+
+.SH BUGS
+Please report bugs at https://github.com/pierre-lecocq/gitsuperv/issues
 
 .SH SEE ALSO
 \fBgit\fP(1)
 
 .SH AUTHOR
-\fBgitsuperv\fP was written by Pierre Lecocq <pierre.lecocq@gmail.com>.
+\fBgitsuperv\fP was written by Pierre Lecocq <pierre.lecocq@gmail.com>
