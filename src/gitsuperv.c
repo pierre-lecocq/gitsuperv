@@ -20,8 +20,8 @@ char **get_repositories_paths()
     struct dirent *file;
 
     /* Open */
-    if ((dirp = opendir(config.basedir)) == NULL) {
-        printf("Can not open directory %s\n", config.basedir);
+    if ((dirp = opendir(config.dir)) == NULL) {
+        printf("Can not open directory %s\n", config.dir);
         exit(1);
     }
 
@@ -42,10 +42,10 @@ char **get_repositories_paths()
         if (strcmp(file->d_name, ".") == 0 || strcmp(file->d_name, "..") == 0 || file->d_type != DT_DIR)
             continue;
 
-        len = strlen(config.basedir) + 1 + strlen(file->d_name) + 1;
+        len = strlen(config.dir) + 1 + strlen(file->d_name) + 1;
         path = (char *) malloc(len * sizeof(char));
 
-        sprintf(path, "%s/%s", config.basedir, file->d_name);
+        sprintf(path, "%s/%s", config.dir, file->d_name);
         paths[count] = path;
         count++;
     }
@@ -242,9 +242,9 @@ void load_config_from_file(char *config_file_path)
             value = strtok(NULL, "=");
             chomp(value);
 
-            if (strcmp(key, "basedir") == 0) {
-                config.basedir = (char *)malloc((strlen(value)+1) * sizeof(char));
-                strcpy(config.basedir, value);
+            if (strcmp(key, "dir") == 0) {
+                config.dir = (char *)malloc((strlen(value)+1) * sizeof(char));
+                strcpy(config.dir, value);
             }
         }
 
@@ -259,7 +259,7 @@ void load_config_from_file(char *config_file_path)
 void usage(int exit_code)
 {
     printf("\ngitsuperv - Watch your git repositories status\n\n");
-    printf("\t-b, --basedir=BASEDIR\n");
+    printf("\t-d, --dir=DIR\n");
     printf("\n");
 
     if (exit_code > 0) {
@@ -276,7 +276,7 @@ int main(int argc, char **argv)
     char **paths;
     char *config_file_path;
     struct option longopts[] = {
-        {"basedir", optional_argument, NULL, 'b'},
+        {"dir", optional_argument, NULL, 'd'},
         {0, 0, 0, 0}
     };
 
@@ -289,10 +289,10 @@ int main(int argc, char **argv)
 
     /* Get options */
     if (argc > 1) {
-        while ((x = getopt_long(argc, argv, "b:", longopts, NULL)) != -1) {
+        while ((x = getopt_long(argc, argv, "d:", longopts, NULL)) != -1) {
             switch (x) {
-            case 'b':
-                config.basedir = optarg;
+            case 'd':
+                config.dir = optarg;
                 break;
 
             default:
@@ -302,7 +302,7 @@ int main(int argc, char **argv)
     }
 
     /* Check options */
-    if (config.basedir == NULL) {
+    if (config.dir == NULL) {
         usage(1);
     }
 

@@ -34,7 +34,7 @@
  */
 
 typedef struct config {
-    char                *basedir;
+    char                *dir;
     int                 use_colors;
     git_status_options  status_opts;
 } st_config;

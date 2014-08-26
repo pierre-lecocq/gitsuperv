@@ -39,7 +39,7 @@ And then try to compile again /gitsuperv/
 Simply run this command:
 
 #+begin_src sh
-gitsuperv -b /path/your/work/directory
+gitsuperv -d /path/your/work/directory
 #+end_src
 
 *** Setup config file (optional)
@@ -47,10 +47,10 @@ gitsuperv -b /path/your/work/directory
 Create a =~/.gitsuperv= file and add an absolute path of the folder that host your repositories (without a trailing slash)
 
 #+begin_src sh
-basedir=/path/your/work/directory
+dir=/path/your/work/directory
 #+end_src
 
-This will allow you to permanently set the /basedir/ (-b) option.
+This will allow you to permanently set the /dir/ (-d) option.
 Now, just run
 
 #+begin_src sh
