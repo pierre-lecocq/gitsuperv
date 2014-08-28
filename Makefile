@@ -27,6 +27,9 @@ uninstall:
 	rm -f $(PROGPATH)/$(PROGNAME)
 	rm -f $(MANPATH)/$(MANPAGE_GZ)
 
+test:
+	./$(PROGNAME) -d ~/work
+
 .PHONY: clean install uninstall
 
 clean:
