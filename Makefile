@@ -8,7 +8,7 @@ PROGPATH=/usr/bin
 MANPATH=/usr/share/man/man1
 
 
-$(PROGNAME): software man manhtml
+$(PROGNAME): software man
 
 software: src/*.c
 	gcc -Wall -fstack-protector -O2 src/*.c -o $(PROGNAME) -lgit2
@@ -28,7 +28,7 @@ uninstall:
 	rm -f $(MANPATH)/$(MANPAGE_GZ)
 
 test:
-	./$(PROGNAME) -d ~/work
+	./$(PROGNAME) -d ~/work/src
 
 .PHONY: clean install uninstall
 
