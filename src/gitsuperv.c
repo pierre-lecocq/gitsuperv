@@ -1,6 +1,6 @@
 /*
  * File: gitsuperv.c
- * Time-stamp: <2014-09-12 10:11:20 pierre>
+ * Time-stamp: <2014-09-12 11:51:57 pierre>
  * Copyright (C) 2014 Pierre Lecocq
  * Description: Git supervisor
  */
@@ -96,20 +96,21 @@ void print_current_status(st_result result)
 {
     char *fmt;
     char *sign;
+    int numpad = 3;
 
     if (config.use_colors == 1) {
-        fmt = "%s%-25s %d files:"
+        fmt = "%s%-25s % *d files:"
             COLOR_CREATED
-            " +%d "
+            " % *d+ "
             COLOR_MODIFIED
-            " ~%d "
+            " % *d~ "
             COLOR_DELETED
-            " -%d "
+            " % *d- "
             COLOR_UNTRACKED
-            " ?%d\n"
+            " % *d?\n"
             COLOR_RESET;
     } else {
-        fmt = "%s%-25s %d files: +%d ~%d -%d ?%d\n";
+        fmt = "%s%-25s % *d files: % *d+ % *d~ % *d- % *d?\n";
     }
 
     if (result.total > 0) {
@@ -121,10 +122,15 @@ void print_current_status(st_result result)
     printf(fmt,
            sign,
            result.name,
+           numpad,
            result.total,
+           numpad,
            result.created,
+           numpad,
            result.modified,
+           numpad,
            result.deleted,
+           numpad,
            result.untracked
     );
 }
