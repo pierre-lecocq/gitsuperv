@@ -1,6 +1,6 @@
 /*
  * File: gitsuperv.c
- * Time-stamp: <2014-08-19 00:00:13 pierre>
+ * Time-stamp: <2014-09-12 10:11:20 pierre>
  * Copyright (C) 2014 Pierre Lecocq
  * Description: Git supervisor
  */
@@ -146,7 +146,7 @@ st_result get_current_status(char *path, git_status_list *status)
     strcpy(result.path, path);
 
     /* Name */
-    // +1 for moving pointer to the second index and remove the slash
+    /* +1 for moving pointer to the second index and remove the slash */
     result.name = strrchr(path, '/') + 1;
 
     /* Init files counters */
@@ -258,7 +258,7 @@ void load_config_from_file(char *config_file_path)
  */
 void usage(int exit_code)
 {
-    printf("\ngitsuperv - Watch your git repositories status\n\n");
+    printf("\ngitsuperv v%s - Watch your git repositories status\n\n", VERSION);
     printf("\t-d, --dir=DIR\n");
     printf("\n");
 

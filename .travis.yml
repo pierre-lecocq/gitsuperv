@@ -1,0 +1,14 @@
+Language: c
+
+compiler:
+  - gcc
+
+branches:
+  only:
+    - master
+
+install:
+  - sudo apt-get install libgit2-dev
+
+script:
+  - make

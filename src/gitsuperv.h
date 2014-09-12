@@ -1,6 +1,6 @@
 /*
  * File: gitsuperv.h
- * Time-stamp: <2014-08-18 23:58:54 pierre>
+ * Time-stamp: <2014-09-12 10:10:45 pierre>
  * Copyright (C) 2014 Pierre Lecocq
  * Description: Git supervisor include file
  */
@@ -21,6 +21,8 @@
 /*
  * Defines
  */
+#define VERSION "1.0.1"
+
 #define MAXBUF 1024
 
 #define COLOR_UNTRACKED         "\x1b[31m"

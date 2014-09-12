@@ -2,39 +2,36 @@ PROGNAME=gitsuperv
 
 MANPAGE=$(PROGNAME).1
 MANPAGE_GZ=$(MANPAGE).gz
-MANPAGE_HTML=$(MANPAGE).html
 
+BUILDPATH=./build
 PROGPATH=/usr/bin
 MANPATH=/usr/share/man/man1
 
+CFLAGS=--pedantic -Wall -fstack-protector -O2
+LDFLAGS=-lgit2
+OBJECTS=src/gitsuperv.o
 
-$(PROGNAME): software man
+$(PROGNAME): software
 
-software: src/*.c
-	gcc -Wall -fstack-protector -O2 src/*.c -o $(PROGNAME) -lgit2
-
-man:
-	gzip -9 -n -c doc/$(MANPAGE) > $(MANPAGE_GZ)
-
-manhtml:
-	cat doc/$(MANPAGE) | groff -mandoc -Thtml > $(MANPAGE_HTML)
+software: $(OBJECTS)
+	mkdir -p $(BUILDPATH)
+	gcc $(CFLAGS) $(OBJECTS) -o $(BUILDPATH)/$(PROGNAME) $(LDFLAGS)
+	gzip -9 -n -c man/$(MANPAGE) > $(BUILDPATH)/$(MANPAGE_GZ)
 
 install:
-	install -D $(PROGNAME) $(PROGPATH)/$(PROGNAME)
-	install -D -m 644 $(MANPAGE_GZ) $(MANPATH)/$(MANPAGE_GZ)
+	install -D $(BUILDPATH)/$(PROGNAME) $(PROGPATH)/$(PROGNAME)
+	install -D -m 644 $(BUILDPATH)/$(MANPAGE_GZ) $(MANPATH)/$(MANPAGE_GZ)
 
 uninstall:
 	rm -f $(PROGPATH)/$(PROGNAME)
 	rm -f $(MANPATH)/$(MANPAGE_GZ)
 
 test:
-	./$(PROGNAME) -d ~/work/src
+	$(BUILDPATH)/$(PROGNAME) -d ~/work/src
 
 .PHONY: clean install uninstall
 
 clean:
-	rm -f $(PROGNAME)
-	rm -f $(MANPAGE_GZ)
-	rm -f $(MANPAGE_HTML)
+	rm -rf $(OBJECTS) $(BUILDPATH)
 
 re: clean $(PROGNAME)
