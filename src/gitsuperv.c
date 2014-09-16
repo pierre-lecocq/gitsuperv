@@ -1,6 +1,6 @@
 /*
  * File: gitsuperv.c
- * Time-stamp: <2014-09-13 20:14:14 pierre>
+ * Time-stamp: <2014-09-16 23:07:00 pierre>
  * Copyright (C) 2014 Pierre Lecocq
  * Description: Git supervisor
  */
@@ -38,29 +38,48 @@ int repository_status(st_repoinfo repoinfo)
  */
 void remote_status(st_repoinfo *repoinfo, git_repository *repo)
 {
-    /* int error_code; */
-    /* git_remote *remote; */
-    /* const git_signature *signature; */
-    /* const char *reflog_message; */
-    /* git_revspec rs; */
+    int error_code;
+    git_remote *remote;
+    git_signature *signature;
+    git_revspec rs;
 
     repoinfo->remote_status = REMOTE_STATUS_CLEAN;
 
     /* fetch origin */
-    /* error_code = git_remote_fetch(remote, signature, reflog_message); */
-    /* if (error_code != 0) */
-    /*     last_git_error(error_code); */
+    /*
+    error_code = git_remote_load(&remote, repo, repoinfo->name);
+    if (error_code < 0) {
+        error_code = git_remote_create_anonymous(&remote, repo, repoinfo->name, NULL);
+        if (error_code < 0) {
+            git_remote_free(remote);
+            last_git_error(error_code);
+        }
+    }
 
-    /* /\* rev-parse *\/ */
-    /* error_code = git_revparse(&rs, repo, "HEAD"); */
-    /* if (error_code != 0) */
-    /*     last_git_error(error_code); */
+    error_code = git_signature_default(&signature, repo);
+    if (error_code < 0)
+        last_git_error(error_code);
 
-    /* printf(" flags = %d | %d | %d | %d | \n", */
-    /*        rs.flags, */
-    /*        GIT_REVPARSE_SINGLE, */
-    /*        GIT_REVPARSE_RANGE, */
-    /*        GIT_REVPARSE_MERGE_BASE); */
+    error_code = git_remote_fetch(remote, signature, NULL);
+    if (error_code != 0)
+        last_git_error(error_code);
+
+*/
+    /* rev-parse */
+
+    error_code = git_repository_open_ext(&repo, repoinfo->path, 0, NULL);
+    if (error_code != 0)
+        last_git_error(error_code);
+
+    error_code = git_revparse(&rs, repo, "HEAD");
+    if (error_code != 0)
+        last_git_error(error_code);
+
+    printf(" flags = %d | %d | %d | %d | \n",
+           rs.flags,
+           GIT_REVPARSE_SINGLE,
+           GIT_REVPARSE_RANGE,
+           GIT_REVPARSE_MERGE_BASE);
 
     /* if ((rs.flags & GIT_REVPARSE_SINGLE) != 0) { */
     /*     printf("up-to-date\n"); */
