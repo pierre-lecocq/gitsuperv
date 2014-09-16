@@ -3,10 +3,9 @@
 .SH NAME
 \fBgitsuperv\fP \- Watch your git repositories status
 
-
 .SH SYNOPSIS
 
-\fBgitsuperv\fP [\fB-d\fP=dir]
+\fBgitsuperv\fP [\fB-d\fP=dir] [\fB-c\fP]
 
 .SH DESCRIPTION
 \fBgitsuperv\fP reports the status of your git repositories
@@ -16,11 +15,16 @@ from your work base directory
 .TP
 .BR \-d ", " \-\-dir =\fIDIR
 The base directory where the software will be rooted
+.TP
+.BR \-c ", " \-\-colors
+Use colors to display the results
 
 .SH FILES
-\fI~/.gitsuperv\fP is the main config files with on of the following options:
+Optionally, you can create a \fI~/.gitsuperv\fP file, which is the main
+config files with the following options:
 .TP
 dir=/path/your/work/directory
+colors=1
 
 .SH BUGS
 Please report bugs at https://github.com/pierre-lecocq/gitsuperv/issues
